@@ -18,6 +18,7 @@ export default {
         'float': 'float 3s ease-in-out infinite',
         'glow': 'glow 2s ease-in-out infinite',
         'shimmer': 'shimmer 2s ease-in-out infinite',
+        'send-pulse': 'sendPulse 0.3s ease-in-out',
       },
       keyframes: {
         fadeInUp: {
@@ -52,6 +53,17 @@ export default {
           },
           '100%': {
             backgroundPosition: '200% 0',
+          },
+        },
+        sendPulse: {
+          '0%': {
+            transform: 'scale(1)',
+          },
+          '50%': {
+            transform: 'scale(1.05)',
+          },
+          '100%': {
+            transform: 'scale(1)',
           },
         },
       },

@@ -11,6 +11,7 @@ export default function ChatUI() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<Chat[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [sendButtonClicked, setSendButtonClicked] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -23,6 +24,10 @@ export default function ChatUI() {
 
   const handleSend = async () => {
     if (!message.trim() || isLoading) return;
+
+    // Trigger send button animation
+    setSendButtonClicked(true);
+    setTimeout(() => setSendButtonClicked(false), 300);
 
     const userMsg = message;
     setMessage("");
@@ -173,10 +178,10 @@ export default function ChatUI() {
               {message && (
                 <button
                   onClick={() => setMessage("")}
-                  className="absolute right-2 sm:right-3 top-2 sm:top-3 text-purple-300 hover:text-white transition-colors p-1 touch-manipulation"
+                  className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-purple-300 hover:text-white transition-all duration-200 p-1.5 hover:bg-white/10 rounded-full touch-manipulation"
                 >
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               )}
@@ -184,17 +189,23 @@ export default function ChatUI() {
             <button
               onClick={handleSend}
               disabled={!message.trim() || isLoading}
-              className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl sm:rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg text-xs sm:text-sm md:text-base min-w-[50px] sm:min-w-[60px] md:min-w-[80px] flex items-center justify-center touch-manipulation"
+              className={`px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl sm:rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg hover:shadow-xl min-w-[44px] sm:min-w-[52px] md:min-w-[60px] h-[44px] sm:h-[52px] md:h-[56px] flex items-center justify-center touch-manipulation group ${sendButtonClicked ? 'animate-send-pulse' : ''}`}
             >
               {isLoading ? (
-                <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                <>
-                  <span className="hidden sm:inline">Send</span>
-                  <svg className="w-3 h-3 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <div className="flex items-center gap-1 sm:gap-2">
+                  {/* Send Icon - Perfect positioning */}
+                  <svg 
+                    className="w-4 h-4 sm:w-5 sm:h-5 md:w-5 md:h-5 transform group-hover:translate-x-0.5 transition-transform duration-200" 
+                    fill="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                   </svg>
-                </>
+                  {/* Text for larger screens */}
+                  <span className="hidden md:inline text-sm font-semibold">Send</span>
+                </div>
               )}
             </button>
           </div>
