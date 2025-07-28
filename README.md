@@ -10,23 +10,28 @@ A modern, responsive chatbot for IoT and networking support, built with React an
 - ⚡ **Fast & Lightweight**: Optimized for performance
 - 🌐 **Single Deployment**: Frontend and backend in one container
 
-## 🚀 Quick Deploy to Railway (Free)
+## 🚀 Quick Deploy
+
+### **Option 1: Deploy to Render (Recommended - Free)**
+
+1. **One-Click Deploy**:
+   [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Klassy01/IoTrix)
+
+2. **Manual Deploy**:
+   ```bash
+   ./deploy-render.sh  # Follow the guide
+   ```
+
+### **Option 2: Deploy to Railway**
 
 1. **Install Railway CLI**:
    ```bash
    npm install -g @railway/cli
    ```
 
-2. **Login & Deploy**:
+2. **Deploy**:
    ```bash
-   railway login
-   cd IoTrix
-   ./deploy-fullstack.sh
-   ```
-
-3. **Set API Key** (optional):
-   ```bash
-   railway variables set OPENAI_API_KEY=your_key_here
+   ./setup-and-deploy.sh
    ```
 
 That's it! Your app will be live at `https://your-app.railway.app` 🎉

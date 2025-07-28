@@ -1,0 +1,27 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "iotrix-fullstack",
+      "env": "docker",
+      "plan": "free",
+      "buildCommand": "",
+      "startCommand": "",
+      "healthCheckPath": "/health",
+      "envVars": [
+        {
+          "key": "ENVIRONMENT",
+          "value": "production"
+        },
+        {
+          "key": "DEBUG", 
+          "value": "false"
+        },
+        {
+          "key": "PORT",
+          "value": "8080"
+        }
+      ]
+    }
+  ]
+}

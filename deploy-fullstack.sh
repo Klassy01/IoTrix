@@ -33,6 +33,17 @@ if ! railway whoami &> /dev/null; then
     railway login
 fi
 
+# Check if project is linked, if not create and link
+echo -e "${YELLOW}🔗 Checking project link...${NC}"
+if ! railway status &> /dev/null; then
+    echo -e "${YELLOW}📋 Creating new Railway project...${NC}"
+    railway login
+    echo -e "${GREEN}✅ Logged in successfully!${NC}"
+    echo -e "${YELLOW}🆕 Initializing new project...${NC}"
+    railway init
+    echo -e "${GREEN}✅ Project created and linked!${NC}"
+fi
+
 # Build and deploy
 echo -e "${YELLOW}🏗️  Building and deploying to Railway...${NC}"
 

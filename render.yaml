@@ -1,0 +1,34 @@
+# Render.com Deployment Configuration
+# This file tells Render how to build and deploy your app
+
+# Build settings
+- type: web
+  name: iotrix-fullstack
+  env: docker
+  dockerfilePath: ./Dockerfile
+  region: oregon
+  plan: free
+  buildCommand: ""
+  startCommand: ""
+  numInstances: 1
+  
+  # Environment variables
+  envVars:
+    - key: ENVIRONMENT
+      value: production
+    - key: DEBUG
+      value: false
+    - key: PORT
+      value: 8080
+    - key: PYTHONPATH
+      value: /app
+    
+  # Auto-deploy settings
+  autoDeploy: true
+  
+  # Health check
+  healthCheckPath: /health
+  
+  # Domain
+  domains:
+    - iotrix-fullstack.onrender.com
