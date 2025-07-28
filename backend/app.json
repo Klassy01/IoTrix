@@ -1,0 +1,30 @@
+{
+  "name": "IoTrix Backend",
+  "description": "AI-powered IoT and Network Assistant API",
+  "repository": "https://github.com/Klassy01/IoTrix",
+  "logo": "https://raw.githubusercontent.com/Klassy01/IoTrix/main/logo.png",
+  "keywords": ["python", "fastapi", "ai", "iot", "networking"],
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "GEMINI_API_KEY": {
+      "description": "Google Gemini AI API Key",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL Database URL (automatically provided by Heroku Postgres)"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "python migrate_db.py"
+  }
+}
