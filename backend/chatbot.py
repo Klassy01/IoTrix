@@ -130,11 +130,28 @@ def get_bot_response(user_message: str, db: Session):
 
         print(f"🔍 [DEBUG] User Message: {user_message} | Topic: {topic}")
 
-        # Create contextual prompt
-        prompt = f"Answer this {topic.upper()} question in detail:\n{user_message}"
+        # Create contextual prompt with formatting instructions
+        prompt = f"""Answer this {topic.upper()} question in detail. 
+        Use simple formatting:
+        - Use bullet points (•) or dashes (-) instead of asterisks
+        - Don't use markdown formatting like **bold** or *italic*
+        - Use clear, simple text formatting
+        - Make the response easy to read
+        
+        Question: {user_message}"""
+        
         response = model.generate_content(prompt)
 
         bot_reply = response.text if response and response.text else "⚠️ No response from AI model."
+        
+        # Clean up the response formatting
+        if bot_reply:
+            # Remove escaped characters and fix formatting
+            bot_reply = bot_reply.replace('\\n', '\n').replace('\\"', '"').replace("\\'", "'")
+            # Replace markdown formatting with simple formatting
+            bot_reply = bot_reply.replace('**', '').replace('*', '•')
+            # Remove any leading/trailing whitespace
+            bot_reply = bot_reply.strip()
 
         # Save in DB
         chat = ChatMessage(user_message=user_message, bot_response=bot_reply)

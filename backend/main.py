@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine, SessionLocal
@@ -25,10 +26,18 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/chat")
+@app.get("/")
+def root():
+    return {"message": "IoTrix Backend API is running!", "status": "healthy"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "iotrix-backend"}
+
+@app.post("/chat", response_class=PlainTextResponse)
 def chat(user_message: str, db: Session = Depends(get_db)):
     bot_reply = get_bot_response(user_message, db)
-    return {"user": user_message, "bot": bot_reply}
+    return bot_reply
 
 @app.get("/history")
 def history(db: Session = Depends(get_db)):

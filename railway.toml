@@ -1,0 +1,24 @@
+# 🚂 Railway Full-Stack Deployment Configuration
+
+[build]
+  builder = "dockerfile"
+  dockerfilePath = "Dockerfile"
+
+[deploy]
+  healthcheckPath = "/health"
+  healthcheckTimeout = 300
+  restartPolicyType = "on_failure"
+  restartPolicyMaxRetries = 3
+
+[env]
+  NODE_ENV = "production"
+  PYTHON_ENV = "production"
+  PORT = "8080"
+  ENVIRONMENT = "production"
+  DEBUG = "false"
+  LOG_LEVEL = "INFO"
+
+[environments.production.deploy]
+  replicas = 1
+  memoryLimit = "1Gi"
+  cpuLimit = "1000m"
