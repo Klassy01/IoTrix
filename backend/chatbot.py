@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 # ✅ Check for API key and configure AI
 try:
     import google.generativeai as genai
-    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or os.getenv("OPENAI_API_KEY")
     if api_key:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("models/gemini-1.5-flash")
