@@ -1,9 +1,25 @@
 from models import ChatMessage
-import google.generativeai as genai
+import os
+import logging
 from sqlalchemy.orm import Session
 
-# ✅ Load Gemini Model
-model = genai.GenerativeModel("models/gemini-1.5-flash")
+# Configure logging
+logger = logging.getLogger(__name__)
+
+# ✅ Check for API key and configure AI
+try:
+    import google.generativeai as genai
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("OPENAI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
+        logger.info("✅ AI model configured successfully")
+    else:
+        model = None
+        logger.warning("⚠️ No API key found - using fallback responses")
+except Exception as e:
+    model = None
+    logger.warning(f"⚠️ AI model setup failed: {e} - using fallback responses")
 
 # ✅ IoT Keywords (Comprehensive)
 IOT_KEYWORDS = [
@@ -128,39 +144,60 @@ def get_bot_response(user_message: str, db: Session):
         if topic is None:
             return "⚠️ I am an IoT & Computer Network assistant. Please ask related questions."
 
-        print(f"🔍 [DEBUG] User Message: {user_message} | Topic: {topic}")
+        logger.info(f"🔍 User Message: {user_message[:50]}... | Topic: {topic}")
 
-        # Create contextual prompt with formatting instructions
-        prompt = f"""Answer this {topic.upper()} question in detail. 
-        Use simple formatting:
-        - Use bullet points (•) or dashes (-) instead of asterisks
-        - Don't use markdown formatting like **bold** or *italic*
-        - Use clear, simple text formatting
-        - Make the response easy to read
-        
-        Question: {user_message}"""
-        
-        response = model.generate_content(prompt)
-
-        bot_reply = response.text if response and response.text else "⚠️ No response from AI model."
-        
-        # Clean up the response formatting
-        if bot_reply:
-            # Remove escaped characters and fix formatting
-            bot_reply = bot_reply.replace('\\n', '\n').replace('\\"', '"').replace("\\'", "'")
-            # Replace markdown formatting with simple formatting
-            bot_reply = bot_reply.replace('**', '').replace('*', '•')
-            # Remove any leading/trailing whitespace
-            bot_reply = bot_reply.strip()
+        # Check if AI model is available
+        if model is None:
+            # Fallback responses when no AI model is available
+            fallback_responses = {
+                "iot": "IoT devices connect everyday objects to the internet, enabling data collection and remote control. Common examples include smart thermostats, security cameras, and fitness trackers.",
+                "network": "Computer networks enable devices to communicate and share resources. Key concepts include routers, switches, IP addresses, and protocols like TCP/IP.",
+                "sensor": "Sensors collect data from the environment (temperature, humidity, motion, etc.) and convert it to digital signals for processing by IoT devices.",
+                "protocol": "Communication protocols define how devices exchange data. Popular IoT protocols include MQTT, CoAP, and HTTP/HTTPS.",
+                "security": "IoT security involves protecting connected devices from cyber threats through encryption, secure authentication, and regular firmware updates."
+            }
+            
+            # Simple topic matching for fallback
+            for key in fallback_responses:
+                if key in user_message.lower():
+                    bot_reply = fallback_responses[key]
+                    break
+            else:
+                bot_reply = "I'm currently running in demo mode. For full AI responses, please configure an API key in the environment variables."
+        else:
+            # Use AI model when available
+            prompt = f"""Answer this {topic.upper()} question in detail. 
+            Use simple formatting:
+            - Use bullet points (•) or dashes (-) instead of asterisks
+            - Don't use markdown formatting like **bold** or *italic*
+            - Use clear, simple text formatting
+            - Make the response easy to read
+            
+            Question: {user_message}"""
+            
+            response = model.generate_content(prompt)
+            bot_reply = response.text if response and response.text else "⚠️ No response from AI model."
+            
+            # Clean up the response formatting
+            if bot_reply:
+                # Remove escaped characters and fix formatting
+                bot_reply = bot_reply.replace('\\n', '\n').replace('\\"', '"').replace("\\'", "'")
+                # Replace markdown formatting with simple formatting
+                bot_reply = bot_reply.replace('**', '').replace('*', '•')
+                # Remove any leading/trailing whitespace
+                bot_reply = bot_reply.strip()
 
         # Save in DB
-        chat = ChatMessage(user_message=user_message, bot_response=bot_reply)
-        db.add(chat)
-        db.commit()
-        db.refresh(chat)
+        try:
+            chat = ChatMessage(user_message=user_message, bot_response=bot_reply)
+            db.add(chat)
+            db.commit()
+            db.refresh(chat)
+        except Exception as e:
+            logger.warning(f"Database save failed: {e}")
 
         return bot_reply
 
     except Exception as e:
-        print(f"❌ [ERROR] get_bot_response: {e}")
+        logger.error(f"get_bot_response error: {e}")
         return "⚠️ Sorry, something went wrong while generating the response."
